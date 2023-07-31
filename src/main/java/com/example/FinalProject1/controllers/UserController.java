@@ -14,7 +14,7 @@ public class UserController {
     UserService userService;
 
     @GetMapping("/auth/{id}")
-    public String getUserAuth(@PathVariable("user_id") String id) {
+    public String getUserAuth(@PathVariable("username") String id) {
         return userService.getUserAuthById(id);
     }
 }

@@ -12,7 +12,7 @@ public class Deals {
     private Long deal_id;
 
     @ManyToOne
-    @JoinColumn(name="user_id")
+    @JoinColumn(name="username")
     private User user;
 
     public Deals(Long deal_id, User user) {

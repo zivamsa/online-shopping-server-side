@@ -11,7 +11,7 @@ import lombok.Data;
 public class User {
 
     @Id
-    private String user_id;
+    private String username;
 
     private String password;
 
@@ -21,20 +21,20 @@ public class User {
 
     private String address;
 
-    public User(String user_id, String password, String auth, String mail, String address) {
-        this.user_id = user_id;
+    public User(String username, String password, String auth, String mail, String address) {
+        this.username = username;
         this.password = password;
         this.auth = auth;
         this.mail = mail;
         this.address = address;
     }
 
-    public String getUser_id() {
-        return user_id;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -72,7 +72,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "user_id='" + user_id + '\'' +
+                "username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", auth='" + auth + '\'' +
                 ", mail='" + mail + '\'' +
