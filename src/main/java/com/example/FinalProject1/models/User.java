@@ -1,5 +1,6 @@
 package com.example.FinalProject1.models;
 
+import com.example.FinalProject1.token.Token;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +30,7 @@ public class User implements UserDetails {
     @Column
     private String password;
 
-    @Column
+    @Column(unique = true)
     private String email;
 
     @Column
@@ -44,6 +45,10 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column
     private Role role;
+
+    @OneToMany(mappedBy = "user")
+    @Column
+    private List<Token> tokens;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
