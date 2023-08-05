@@ -1,82 +1,79 @@
 package com.example.FinalProject1.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class User {
+@NamedQuery(name = "User.findByEmail",
+        query = "SELECT u FROM User u WHERE u.email = ?1")
+public class User implements UserDetails {
 
     @Id
-    private String username;
+    @GeneratedValue
+    private Integer id;
 
+    @Column
     private String password;
 
-    private String auth;
+    @Column
+    private String email;
 
-    private String mail;
-
+    @Column
     private String address;
 
-    public User(String username, String password, String auth, String mail, String address) {
-        this.username = username;
-        this.password = password;
-        this.auth = auth;
-        this.mail = mail;
-        this.address = address;
-    }
+    @Column
+    private String firstname;
 
-    public String getUsername() {
-        return username;
-    }
+    @Column
+    private String lastname;
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Role role;
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getAuth() {
-        return auth;
-    }
-
-    public void setAuth(String auth) {
-        this.auth = auth;
-    }
-
-    public String getMail() {
-        return mail;
-    }
-
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
-    public String toString() {
-        return "User{" +
-                "username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", auth='" + auth + '\'' +
-                ", mail='" + mail + '\'' +
-                ", address='" + address + '\'' +
-                '}';
+    public String getUsername() {
+        return email;
     }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+
 }

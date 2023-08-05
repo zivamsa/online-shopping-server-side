@@ -1,5 +1,6 @@
 package com.example.FinalProject1.controllers;
 
+import com.example.FinalProject1.models.User;
 import com.example.FinalProject1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +14,9 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/auth/{id}")
-    public String getUserAuth(@PathVariable("username") String id) {
-        return userService.getUserAuthById(id);
+    @GetMapping("/user/{id}")
+    public User getUser(@PathVariable("id") Integer id) {
+        return userService.getUserById(id);
     }
+
 }

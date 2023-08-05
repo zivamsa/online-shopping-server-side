@@ -1,7 +1,7 @@
 package com.example.FinalProject1.services;
 
 import com.example.FinalProject1.models.Deals;
-import com.example.FinalProject1.repo.DealsRepo;
+import com.example.FinalProject1.repository.DealsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public class DealService {
     @Autowired
-    DealsRepo repository;
+    DealsRepository repository;
 
     public Deals getDealById(Long id) {
         return repository.findById(id).get();

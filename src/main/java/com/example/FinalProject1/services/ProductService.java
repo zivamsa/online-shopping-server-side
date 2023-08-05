@@ -1,7 +1,7 @@
 package com.example.FinalProject1.services;
 
 import com.example.FinalProject1.models.Product;
-import com.example.FinalProject1.repo.ProductRepo;
+import com.example.FinalProject1.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +12,7 @@ import java.util.List;
 public class ProductService {
 
     @Autowired
-    ProductRepo repository;
+    ProductRepository repository;
 
     public Product getProductById(Long id) {
         return repository.findById(id).get();
