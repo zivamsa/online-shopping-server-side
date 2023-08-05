@@ -6,9 +6,9 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@ComponentScan({"com.example.FinalProject1.controllers","com.example.FinalProject1.services"})
-@EntityScan("com.example.FinalProject1.models")
-@EnableJpaRepositories("com.example.FinalProject1.repository")
+//@ComponentScan({"com.example.FinalProject1.controllers","com.example.FinalProject1.services"})
+//@EntityScan("com.example.FinalProject1.models")
+//@EnableJpaRepositories("com.example.FinalProject1.repository")
 @SpringBootApplication
 public class FinalProject1Application {
 
