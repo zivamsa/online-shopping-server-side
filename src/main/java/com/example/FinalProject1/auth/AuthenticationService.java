@@ -1,8 +1,7 @@
 package com.example.FinalProject1.auth;
 
 import com.example.FinalProject1.config.JwtService;
-import com.example.FinalProject1.exceptions.UserEmailAlreadyRegisterd;
-import com.example.FinalProject1.models.Role;
+import com.example.FinalProject1.exceptions.UserEmailAlreadyRegistered;
 import com.example.FinalProject1.models.User;
 import com.example.FinalProject1.repository.UserRepository;
 import com.example.FinalProject1.token.Token;
@@ -33,11 +32,11 @@ public class AuthenticationService {
     private final TokenRepository tokenRepository;
 
 
-    public AuthenticationResponse register(RegisterRequest request) throws UserEmailAlreadyRegisterd {
+    public AuthenticationResponse register(RegisterRequest request) throws UserEmailAlreadyRegistered {
         Optional<User> userOptional = repository.findByEmail(request.getEmail());
 
         if (userOptional.isPresent()) {
-            throw new UserEmailAlreadyRegisterd("User with this email already exists");
+            throw new UserEmailAlreadyRegistered("User with this email already exists");
         } else {
             var user = User.builder()
                     .firstname(request.getFirstname())

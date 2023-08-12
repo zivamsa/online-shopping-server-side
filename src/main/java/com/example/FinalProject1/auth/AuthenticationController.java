@@ -1,6 +1,6 @@
 package com.example.FinalProject1.auth;
 
-import com.example.FinalProject1.exceptions.UserEmailAlreadyRegisterd;
+import com.example.FinalProject1.exceptions.UserEmailAlreadyRegistered;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
@@ -22,7 +22,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody RegisterRequest request
-    ) throws UserEmailAlreadyRegisterd {
+    ) throws UserEmailAlreadyRegistered {
         return ResponseEntity.ok(service.register(request));
     }
 
