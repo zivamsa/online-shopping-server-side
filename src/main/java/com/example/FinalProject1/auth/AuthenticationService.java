@@ -54,6 +54,7 @@ public class AuthenticationService {
                     .refreshToken(refreshToken)
                     .firstname(user.getFirstname())
                     .lastname(user.getLastname())
+                    .role(user.getRole())
                     .build();
         }
     }
@@ -76,6 +77,7 @@ public class AuthenticationService {
                 .refreshToken(refreshToken)
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
+                .role(user.getRole())
                 .build();
     }
 

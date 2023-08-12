@@ -1,5 +1,6 @@
 package com.example.FinalProject1.auth;
 
+import com.example.FinalProject1.models.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,4 +21,6 @@ public class AuthenticationResponse {
     private String firstname;
     @JsonProperty("lastname")
     private String lastname;
+    @JsonProperty("role")
+    private Role role;
 }
