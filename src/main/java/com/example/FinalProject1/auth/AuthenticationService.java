@@ -112,7 +112,7 @@ public class AuthenticationService {
         if (refreshToken == "") {
             return;
         }
-        User user = this.extractUser(refreshToken);
+        User user = this.getUserByToken(refreshToken);
         if (user == null || !jwtService.isTokenValid(refreshToken, user)) {
             return;
         }
@@ -136,7 +136,7 @@ public class AuthenticationService {
         return authHeader.substring(prefix.length());
     }
 
-    private User extractUser(String refreshToken) {
+    private User getUserByToken(String refreshToken) {
         final String email = jwtService.extractUsername(refreshToken);
         if (email == null) {
             return null;
@@ -147,7 +147,7 @@ public class AuthenticationService {
     public AuthenticationResponse authenticateByToken(HttpServletRequest request) {
         final String token = extractHeaderRefreshToken(request);
         if (token == "") return null;
-        User user = extractUser(token);
+        User user = getUserByToken(token);
         if (user == null) return null;
         return AuthenticationResponse.builder()
                 .firstname(user.getFirstname())
@@ -155,5 +155,17 @@ public class AuthenticationService {
                 .role(user.getRole())
                 .accessToken(token)
                 .build();
+    }
+
+    public User getUserByRequest(HttpServletRequest request) {
+        final String token = extractHeaderRefreshToken(request);
+        if (token == "") return null;
+        return getUserByToken(token);
+    }
+
+    public boolean isUserAdmin(HttpServletRequest request) {
+        User user = getUserByRequest(request);
+        if (user == null) return false;
+        return user.isAdmin();
     }
 }
