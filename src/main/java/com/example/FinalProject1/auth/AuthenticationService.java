@@ -108,9 +108,12 @@ public class AuthenticationService {
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
-        final String refreshToken = this.extractHeaderRefreshToken(request).orElseThrow();
-        User user = this.extractUser(refreshToken).orElseThrow();
-        if (!jwtService.isTokenValid(refreshToken, user)) {
+        final String refreshToken = this.extractHeaderRefreshToken(request);
+        if (refreshToken == "") {
+            return;
+        }
+        User user = this.extractUser(refreshToken);
+        if (user == null || !jwtService.isTokenValid(refreshToken, user)) {
             return;
         }
         final String newAccessToken = jwtService.generateToken(user);
@@ -124,21 +127,33 @@ public class AuthenticationService {
         new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
     }
 
-    private Optional<String> extractHeaderRefreshToken(HttpServletRequest request) {
+    private String extractHeaderRefreshToken(HttpServletRequest request) {
         final String prefix = "Bearer ";
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith(prefix)) {
-            return Optional.empty();
+            return "";
         }
-        final String refreshToken = authHeader.substring(prefix.length());
-        return Optional.ofNullable(refreshToken == "" ? null : refreshToken);
+        return authHeader.substring(prefix.length());
     }
 
-    public Optional<User> extractUser(String refreshToken) {
+    private User extractUser(String refreshToken) {
         final String email = jwtService.extractUsername(refreshToken);
         if (email == null) {
-            return Optional.empty();
+            return null;
         }
-        return this.repository.findByEmail(email);
+        return this.repository.findByEmail(email).orElse(null);
+    }
+
+    public AuthenticationResponse authenticateByToken(HttpServletRequest request) {
+        final String token = extractHeaderRefreshToken(request);
+        if (token == "") return null;
+        User user = extractUser(token);
+        if (user == null) return null;
+        return AuthenticationResponse.builder()
+                .firstname(user.getFirstname())
+                .lastname(user.getLastname())
+                .role(user.getRole())
+                .accessToken(token)
+                .build();
     }
 }
