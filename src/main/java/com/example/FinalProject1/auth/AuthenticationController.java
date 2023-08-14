@@ -30,20 +30,31 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.authenticate(request));
     }
     @GetMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(HttpServletRequest request,
+    public ResponseEntity<?> authenticate(HttpServletRequest request,
                                              HttpServletResponse response) {
         var out = service.authenticateByToken(request);
         if (out == null) {
-            return (ResponseEntity<AuthenticationResponse>) ResponseEntity.notFound();
+            return (ResponseEntity<?>) ResponseEntity.notFound();
         }
         return ResponseEntity.ok(out);
     }
 
     @PostMapping("/refresh-token")
-    public void refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
-        service.refreshToken(request, response);
+    public ResponseEntity<?> refreshToken(
+            @RequestBody TokenRefreshRequest request
+    ) {
+        final String refreshToken = request.getRefreshToken();
+        try {
+            final String token = service.refreshToken(refreshToken);
+            return ResponseEntity.ok(
+                    TokenRefreshResponse
+                            .builder()
+                            .refreshToken(refreshToken)
+                            .accessToken(token)
+                            .build()
+            );
+        } catch (Exception e) {
+            return (ResponseEntity<?>) ResponseEntity.notFound();
+        }
     }
 }

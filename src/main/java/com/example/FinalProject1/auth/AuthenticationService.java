@@ -1,16 +1,16 @@
 package com.example.FinalProject1.auth;
 
 import com.example.FinalProject1.config.JwtService;
+import com.example.FinalProject1.exceptions.TokenDoesntExist;
+import com.example.FinalProject1.exceptions.TokenExpired;
 import com.example.FinalProject1.exceptions.UserEmailAlreadyRegistered;
 import com.example.FinalProject1.models.Role;
 import com.example.FinalProject1.models.User;
 import com.example.FinalProject1.repository.UserRepository;
 import com.example.FinalProject1.token.Token;
 import com.example.FinalProject1.token.TokenRepository;
-import com.example.FinalProject1.token.TokenType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.FinalProject1.token.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -27,6 +28,7 @@ import java.util.Optional;
 public class AuthenticationService {
 
     private final UserRepository userRepository;
+    private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -48,16 +50,29 @@ public class AuthenticationService {
                 .role(Role.USER)
                 .build();
         User savedUser = userRepository.save(user);
-        String jwtToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
-        saveUserToken(savedUser, jwtToken);
+        String jwtToken = jwtService.generateAccessToken(savedUser);
+        String refreshToken = createRefreshToken(savedUser);
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
-                .firstname(user.getFirstname())
-                .lastname(user.getLastname())
-                .role(user.getRole())
+                .firstname(savedUser.getFirstname())
+                .lastname(savedUser.getLastname())
+                .role(savedUser.getRole())
                 .build();
+    }
+
+    private String createRefreshToken(User user) {
+        String refreshToken = jwtService.generateRefreshToken(user);
+        Date expiration = new Date(System.currentTimeMillis() + jwtService.refreshExpiration);
+        Token token = Token
+                .builder()
+                .refreshToken(refreshToken)
+                .expiryDate(expiration)
+                .user(user)
+                .build();
+        tokenRepository.save(token);
+
+        return refreshToken;
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -69,10 +84,15 @@ public class AuthenticationService {
         );
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
         var jwtToken = jwtService.generateAccessToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
-        revokeAllUserTokens(user);
-        saveUserToken(user, jwtToken);
+        var currentRefresh = queryRefreshToken(user);
+        String refreshToken;
+        if (currentRefresh.isEmpty()) {
+            refreshToken = createRefreshToken(user);
+        } else {
+            refreshToken = currentRefresh.get().refreshToken;
+        }
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
@@ -82,52 +102,18 @@ public class AuthenticationService {
                 .build();
     }
 
-    private void saveUserToken(User user, String jwtToken) {
-        var token = Token.builder()
-                .user(user)
-                .token(jwtToken)
-                .tokenType(TokenType.BEARER)
-                .expired(false)
-                .revoked(false)
-                .build();
-        tokenRepository.save(token);
-    }
-
-    private void revokeAllUserTokens(User user) {
-        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
-        if (validUserTokens.isEmpty())
-            return;
-        validUserTokens.forEach(token -> {
-            token.setExpired(true);
-            token.setRevoked(true);
-        });
-        tokenRepository.saveAll(validUserTokens);
-    }
-
-    public void refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
-        final String refreshToken = this.extractHeaderRefreshToken(request);
-        if (refreshToken == "") {
-            return;
+    public String refreshToken(String refreshToken) throws TokenDoesntExist, TokenExpired {
+        Optional<Token> dbTokenOptional = tokenRepository.findByRefreshToken(refreshToken);
+        if (dbTokenOptional.isEmpty()) {
+            throw new TokenDoesntExist();
         }
-        User user = this.getUserByToken(refreshToken);
-        if (user == null || !jwtService.isTokenValid(refreshToken, user)) {
-            return;
-        }
-        final String newAccessToken = jwtService.generateAccessToken(user);
-        revokeAllUserTokens(user);
-        saveUserToken(user, newAccessToken);
-        var authResponse = AuthenticationResponse
-                .builder()
-                .accessToken(newAccessToken)
-                .refreshToken(refreshToken)
-                .build();
-        new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+
+        Token dbToken = tokenService.verifyExpiration(dbTokenOptional.get());
+        User user = dbToken.getUser();
+        return jwtService.generateAccessToken(user);
     }
 
-    private String extractHeaderRefreshToken(HttpServletRequest request) {
+    private String extractHeaderAccessToken(HttpServletRequest request) {
         final String prefix = "Bearer ";
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith(prefix)) {
@@ -144,21 +130,30 @@ public class AuthenticationService {
         return this.userRepository.findByEmail(email).orElse(null);
     }
 
+    private Optional<Token> queryRefreshToken(User user) {
+        return tokenRepository
+                .findByUser(user)
+                .stream().filter((currDBToken)->!currDBToken.isExpired())
+                .findFirst();
+    }
+
     public AuthenticationResponse authenticateByToken(HttpServletRequest request) {
-        final String token = extractHeaderRefreshToken(request);
+        final String token = extractHeaderAccessToken(request);
         if (token == "") return null;
         User user = getUserByToken(token);
         if (user == null) return null;
+        String refreshToken = queryRefreshToken(user).orElseThrow().refreshToken;
         return AuthenticationResponse.builder()
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
                 .role(user.getRole())
                 .accessToken(token)
+                .refreshToken(refreshToken)
                 .build();
     }
 
     public User getUserByRequest(HttpServletRequest request) {
-        final String token = extractHeaderRefreshToken(request);
+        final String token = extractHeaderAccessToken(request);
         if (token == "") return null;
         return getUserByToken(token);
     }
