@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -48,16 +49,27 @@ public class AuthenticationService {
                 .role(Role.USER)
                 .build();
         User savedUser = userRepository.save(user);
-        String jwtToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
-        saveUserToken(savedUser, jwtToken);
+        String jwtToken = jwtService.generateAccessToken(savedUser);
+        String refreshToken = jwtService.generateRefreshToken(savedUser);
+        saveRefreshToken(savedUser, refreshToken);
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
-                .firstname(user.getFirstname())
-                .lastname(user.getLastname())
-                .role(user.getRole())
+                .firstname(savedUser.getFirstname())
+                .lastname(savedUser.getLastname())
+                .role(savedUser.getRole())
                 .build();
+    }
+
+    private void saveRefreshToken(User user, String refresh_token) {
+        Date expiration = new Date(System.currentTimeMillis() + jwtService.refreshExpiration);
+        Token token = Token
+                .builder()
+                .refreshToken(refresh_token)
+                .expiryDate(expiration)
+                .user(user)
+                .build();
+        tokenRepository.save(token);
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -69,10 +81,19 @@ public class AuthenticationService {
         );
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
         var jwtToken = jwtService.generateAccessToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
-        revokeAllUserTokens(user);
-        saveUserToken(user, jwtToken);
+        var currentRefresh = tokenRepository
+                .findByUser(user)
+                .stream().filter(token -> !token.isExpired())
+                .findFirst();
+        String refreshToken;
+        if (currentRefresh.isEmpty()) {
+            refreshToken = jwtService.generateRefreshToken(user);
+            saveRefreshToken(user, refreshToken);
+        } else {
+            refreshToken = currentRefresh.get().refreshToken;
+        }
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
@@ -82,49 +103,10 @@ public class AuthenticationService {
                 .build();
     }
 
-    private void saveUserToken(User user, String jwtToken) {
-        var token = Token.builder()
-                .user(user)
-                .accessToken(jwtToken)
-                .tokenType(TokenType.BEARER)
-                .expired(false)
-                .revoked(false)
-                .build();
-        tokenRepository.save(token);
-    }
-
-    private void revokeAllUserTokens(User user) {
-        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
-        if (validUserTokens.isEmpty())
-            return;
-        validUserTokens.forEach(token -> {
-            token.setExpired(true);
-            token.setRevoked(true);
-        });
-        tokenRepository.saveAll(validUserTokens);
-    }
-
     public void refreshToken(
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
-        final String refreshToken = this.extractHeaderRefreshToken(request);
-        if (refreshToken == "") {
-            return;
-        }
-        User user = this.getUserByToken(refreshToken);
-        if (user == null || !jwtService.isTokenValid(refreshToken, user)) {
-            return;
-        }
-        final String newAccessToken = jwtService.generateAccessToken(user);
-        revokeAllUserTokens(user);
-        saveUserToken(user, newAccessToken);
-        var authResponse = AuthenticationResponse
-                .builder()
-                .accessToken(newAccessToken)
-                .refreshToken(refreshToken)
-                .build();
-        new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
     }
 
     private String extractHeaderRefreshToken(HttpServletRequest request) {
