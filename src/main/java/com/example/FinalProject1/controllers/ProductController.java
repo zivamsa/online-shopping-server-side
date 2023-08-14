@@ -1,6 +1,6 @@
 package com.example.FinalProject1.controllers;
 
-import com.example.FinalProject1.auth.AuthenticationService;
+import com.example.FinalProject1.services.AuthenticationService;
 import com.example.FinalProject1.exceptions.LackingPermissions;
 import com.example.FinalProject1.models.Product;
 import com.example.FinalProject1.services.ProductService;

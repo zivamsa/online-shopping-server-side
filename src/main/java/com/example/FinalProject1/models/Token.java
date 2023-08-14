@@ -1,4 +1,4 @@
-package com.example.FinalProject1.token;
+package com.example.FinalProject1.models;
 
 import com.example.FinalProject1.models.User;
 import jakarta.persistence.*;

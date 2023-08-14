@@ -1,4 +1,4 @@
-package com.example.FinalProject1.auth;
+package com.example.FinalProject1.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationRequest {
-
-    private String email;
-
-    String password;
+public class TokenRefreshResponse {
+    private String accessToken;
+    private String refreshToken;
 }

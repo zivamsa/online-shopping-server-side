@@ -1,4 +1,4 @@
-package com.example.FinalProject1.auth;
+package com.example.FinalProject1.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

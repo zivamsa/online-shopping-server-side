@@ -1,6 +1,7 @@
 package com.example.FinalProject1.config;
 
-import com.example.FinalProject1.token.TokenRepository;
+import com.example.FinalProject1.services.JwtService;
+import com.example.FinalProject1.repository.TokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

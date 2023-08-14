@@ -1,15 +1,16 @@
-package com.example.FinalProject1.auth;
+package com.example.FinalProject1.services;
 
-import com.example.FinalProject1.config.JwtService;
+import com.example.FinalProject1.dto.LoginRequest;
+import com.example.FinalProject1.dto.AuthenticationResponse;
+import com.example.FinalProject1.dto.RegisterRequest;
 import com.example.FinalProject1.exceptions.TokenDoesntExist;
 import com.example.FinalProject1.exceptions.TokenExpired;
 import com.example.FinalProject1.exceptions.UserEmailAlreadyRegistered;
 import com.example.FinalProject1.models.Role;
 import com.example.FinalProject1.models.User;
 import com.example.FinalProject1.repository.UserRepository;
-import com.example.FinalProject1.token.Token;
-import com.example.FinalProject1.token.TokenRepository;
-import com.example.FinalProject1.token.TokenService;
+import com.example.FinalProject1.models.Token;
+import com.example.FinalProject1.repository.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +20,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
@@ -61,21 +61,7 @@ public class AuthenticationService {
                 .build();
     }
 
-    private String createRefreshToken(User user) {
-        String refreshToken = jwtService.generateRefreshToken(user);
-        Date expiration = new Date(System.currentTimeMillis() + jwtService.refreshExpiration);
-        Token token = Token
-                .builder()
-                .refreshToken(refreshToken)
-                .expiryDate(expiration)
-                .user(user)
-                .build();
-        tokenRepository.save(token);
-
-        return refreshToken;
-    }
-
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationResponse login(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -85,7 +71,7 @@ public class AuthenticationService {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        var jwtToken = jwtService.generateAccessToken(user);
+        String jwtToken = jwtService.generateAccessToken(user);
         var currentRefresh = queryRefreshToken(user);
         String refreshToken;
         if (currentRefresh.isEmpty()) {
@@ -111,6 +97,20 @@ public class AuthenticationService {
         Token dbToken = tokenService.verifyExpiration(dbTokenOptional.get());
         User user = dbToken.getUser();
         return jwtService.generateAccessToken(user);
+    }
+
+    private String createRefreshToken(User user) {
+        String refreshToken = jwtService.generateRefreshToken(user);
+        Date expiration = new Date(System.currentTimeMillis() + jwtService.refreshExpiration);
+        Token token = Token
+                .builder()
+                .refreshToken(refreshToken)
+                .expiryDate(expiration)
+                .user(user)
+                .build();
+        tokenRepository.save(token);
+
+        return refreshToken;
     }
 
     private String extractHeaderAccessToken(HttpServletRequest request) {

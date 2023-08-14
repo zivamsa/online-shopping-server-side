@@ -1,6 +1,5 @@
 package com.example.FinalProject1.models;
 
-import com.example.FinalProject1.token.Token;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

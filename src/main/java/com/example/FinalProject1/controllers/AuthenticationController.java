@@ -1,13 +1,13 @@
-package com.example.FinalProject1.auth;
+package com.example.FinalProject1.controllers;
 
+import com.example.FinalProject1.dto.*;
 import com.example.FinalProject1.exceptions.UserEmailAlreadyRegistered;
+import com.example.FinalProject1.services.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/auth")
@@ -25,9 +25,9 @@ public class AuthenticationController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request
+            @RequestBody LoginRequest request
     ) {
-        return ResponseEntity.ok(service.authenticate(request));
+        return ResponseEntity.ok(service.login(request));
     }
     @GetMapping("/authenticate")
     public ResponseEntity<?> authenticate(HttpServletRequest request,

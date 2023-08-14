@@ -1,4 +1,4 @@
-package com.example.FinalProject1.auth;
+package com.example.FinalProject1.dto;
 
 import com.example.FinalProject1.models.Role;
 import lombok.AllArgsConstructor;
@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class AuthenticationResponse {
+    private String accessToken;
+    private String refreshToken;
     private String firstname;
     private String lastname;
-    private String email;
-    private String password;
-    private String address;
+    private Role role;
 }

@@ -1,4 +1,4 @@
-package com.example.FinalProject1.config;
+package com.example.FinalProject1.services;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
