@@ -1,0 +1,53 @@
+package OnlineShopping.controllers;
+
+import OnlineShopping.models.Product;
+import OnlineShopping.services.AuthenticationService;
+import OnlineShopping.exceptions.LackingPermissions;
+import OnlineShopping.services.ProductService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(path = "/product")
+public class ProductController {
+    @Autowired
+    ProductService productService;
+
+    @Autowired
+    AuthenticationService authenticationService;
+
+    @GetMapping("/products")
+    public List<Product> getAllProducts() {
+        return productService.getAllProducts();
+    }
+
+    @GetMapping("/product/{id}")
+    public Product getProduct(@PathVariable("id") Long id) {
+        return productService.getProductById(id);
+    }
+
+    @PostMapping("/product")
+    public Product addProduct(
+            @RequestBody Product product,
+            HttpServletRequest request
+    ) throws LackingPermissions {
+        if (!authenticationService.isUserAdmin(request)) {
+            throw new LackingPermissions();
+        }
+        return productService.saveOrUpdate(product);
+    }
+
+    @PutMapping("/product")
+    public Product updateProduct(
+            @RequestBody Product product,
+            HttpServletRequest request
+    ) throws LackingPermissions {
+        if (!authenticationService.isUserAdmin(request)) {
+            throw new LackingPermissions();
+        }
+        return productService.saveOrUpdate(product);
+    }
+}
