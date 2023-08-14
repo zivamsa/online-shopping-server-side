@@ -18,8 +18,8 @@ public class Token {
     @GeneratedValue
     public Integer id;
 
-    @Column(unique = true)
-    public String token;
+    @Column(unique = true, name = "access_token")
+    public String accessToken;
 
     @Enumerated(EnumType.STRING)
     public TokenType tokenType = TokenType.BEARER;
