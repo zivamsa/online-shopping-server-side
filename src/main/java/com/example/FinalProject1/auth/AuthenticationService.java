@@ -7,8 +7,6 @@ import com.example.FinalProject1.models.User;
 import com.example.FinalProject1.repository.UserRepository;
 import com.example.FinalProject1.token.Token;
 import com.example.FinalProject1.token.TokenRepository;
-import com.example.FinalProject1.token.TokenType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -83,10 +81,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         var jwtToken = jwtService.generateAccessToken(user);
-        var currentRefresh = tokenRepository
-                .findByUser(user)
-                .stream().filter(token -> !token.isExpired())
-                .findFirst();
+        var currentRefresh = queryRefreshToken(user);
         String refreshToken;
         if (currentRefresh.isEmpty()) {
             refreshToken = jwtService.generateRefreshToken(user);
@@ -109,7 +104,7 @@ public class AuthenticationService {
     ) throws IOException {
     }
 
-    private String extractHeaderRefreshToken(HttpServletRequest request) {
+    private String extractHeaderAccessToken(HttpServletRequest request) {
         final String prefix = "Bearer ";
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith(prefix)) {
@@ -126,21 +121,30 @@ public class AuthenticationService {
         return this.userRepository.findByEmail(email).orElse(null);
     }
 
+    private Optional<Token> queryRefreshToken(User user) {
+        return tokenRepository
+                .findByUser(user)
+                .stream().filter((currDBToken)->!currDBToken.isExpired())
+                .findFirst();
+    }
+
     public AuthenticationResponse authenticateByToken(HttpServletRequest request) {
-        final String token = extractHeaderRefreshToken(request);
+        final String token = extractHeaderAccessToken(request);
         if (token == "") return null;
         User user = getUserByToken(token);
         if (user == null) return null;
+        String refreshToken = queryRefreshToken(user).orElseThrow().refreshToken;
         return AuthenticationResponse.builder()
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
                 .role(user.getRole())
                 .accessToken(token)
+                .refreshToken(refreshToken)
                 .build();
     }
 
     public User getUserByRequest(HttpServletRequest request) {
-        final String token = extractHeaderRefreshToken(request);
+        final String token = extractHeaderAccessToken(request);
         if (token == "") return null;
         return getUserByToken(token);
     }
