@@ -1,14 +1,16 @@
 package com.example.FinalProject1.auth;
 
 import com.example.FinalProject1.config.JwtService;
+import com.example.FinalProject1.exceptions.TokenDoesntExist;
+import com.example.FinalProject1.exceptions.TokenExpired;
 import com.example.FinalProject1.exceptions.UserEmailAlreadyRegistered;
 import com.example.FinalProject1.models.Role;
 import com.example.FinalProject1.models.User;
 import com.example.FinalProject1.repository.UserRepository;
 import com.example.FinalProject1.token.Token;
 import com.example.FinalProject1.token.TokenRepository;
+import com.example.FinalProject1.token.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +28,7 @@ import java.util.Optional;
 public class AuthenticationService {
 
     private final UserRepository userRepository;
+    private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -99,10 +102,15 @@ public class AuthenticationService {
                 .build();
     }
 
-    public void refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
+    public String refreshToken(String refreshToken) throws TokenDoesntExist, TokenExpired {
+        Optional<Token> dbTokenOptional = tokenRepository.findByRefreshToken(refreshToken);
+        if (dbTokenOptional.isEmpty()) {
+            throw new TokenDoesntExist();
+        }
+
+        Token dbToken = tokenService.verifyExpiration(dbTokenOptional.get());
+        User user = dbToken.getUser();
+        return jwtService.generateAccessToken(user);
     }
 
     private String extractHeaderAccessToken(HttpServletRequest request) {
