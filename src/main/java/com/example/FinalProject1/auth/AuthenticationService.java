@@ -48,8 +48,7 @@ public class AuthenticationService {
                 .build();
         User savedUser = userRepository.save(user);
         String jwtToken = jwtService.generateAccessToken(savedUser);
-        String refreshToken = jwtService.generateRefreshToken(savedUser);
-        saveRefreshToken(savedUser, refreshToken);
+        String refreshToken = createRefreshToken(savedUser);
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
@@ -59,15 +58,18 @@ public class AuthenticationService {
                 .build();
     }
 
-    private void saveRefreshToken(User user, String refresh_token) {
+    private String createRefreshToken(User user) {
+        String refreshToken = jwtService.generateRefreshToken(user);
         Date expiration = new Date(System.currentTimeMillis() + jwtService.refreshExpiration);
         Token token = Token
                 .builder()
-                .refreshToken(refresh_token)
+                .refreshToken(refreshToken)
                 .expiryDate(expiration)
                 .user(user)
                 .build();
         tokenRepository.save(token);
+
+        return refreshToken;
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -84,8 +86,7 @@ public class AuthenticationService {
         var currentRefresh = queryRefreshToken(user);
         String refreshToken;
         if (currentRefresh.isEmpty()) {
-            refreshToken = jwtService.generateRefreshToken(user);
-            saveRefreshToken(user, refreshToken);
+            refreshToken = createRefreshToken(user);
         } else {
             refreshToken = currentRefresh.get().refreshToken;
         }
