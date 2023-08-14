@@ -23,7 +23,7 @@ public class ProductService {
         repository.findAll().forEach(product -> products.add(product));
         return products;
     }
-    public void saveOrUpdate(Product product) {
-        repository.save(product);
+    public Product saveOrUpdate(Product product) {
+        return repository.save(product);
     }
 }

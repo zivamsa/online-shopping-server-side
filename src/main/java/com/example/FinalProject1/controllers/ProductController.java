@@ -30,24 +30,24 @@ public class ProductController {
     }
 
     @PostMapping("/product")
-    public void addProduct(
+    public Product addProduct(
             @RequestBody Product product,
             HttpServletRequest request
     ) throws LackingPermissions {
         if (!authenticationService.isUserAdmin(request)) {
             throw new LackingPermissions();
         }
-        productService.saveOrUpdate(product);
+        return productService.saveOrUpdate(product);
     }
 
     @PutMapping("/product")
-    public void updateProduct(
+    public Product updateProduct(
             @RequestBody Product product,
             HttpServletRequest request
     ) throws LackingPermissions {
         if (!authenticationService.isUserAdmin(request)) {
             throw new LackingPermissions();
         }
-        productService.saveOrUpdate(product);
+        return productService.saveOrUpdate(product);
     }
 }
