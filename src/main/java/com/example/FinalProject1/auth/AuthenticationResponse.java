@@ -12,15 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthenticationResponse {
-
-    @JsonProperty("access_token")
     private String accessToken;
-    @JsonProperty("refresh_token")
     private String refreshToken;
-    @JsonProperty("firstname")
     private String firstname;
-    @JsonProperty("lastname")
     private String lastname;
-    @JsonProperty("role")
     private Role role;
 }
