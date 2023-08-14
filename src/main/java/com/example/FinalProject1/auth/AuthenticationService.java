@@ -26,7 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -34,7 +34,7 @@ public class AuthenticationService {
 
 
     public AuthenticationResponse register(RegisterRequest request) throws UserEmailAlreadyRegistered {
-        Optional<User> userOptional = repository.findByEmail(request.getEmail());
+        Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
 
         if (userOptional.isPresent()) {
             throw new UserEmailAlreadyRegistered("User with this email already exists");
@@ -47,8 +47,8 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
-        User savedUser = repository.save(user);
-        String jwtToken = jwtService.generateToken(user);
+        User savedUser = userRepository.save(user);
+        String jwtToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);
         return AuthenticationResponse.builder()
@@ -67,9 +67,9 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
-        var user = repository.findByEmail(request.getEmail())
+        var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        var jwtToken = jwtService.generateToken(user);
+        var jwtToken = jwtService.generateAccessToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
@@ -116,7 +116,7 @@ public class AuthenticationService {
         if (user == null || !jwtService.isTokenValid(refreshToken, user)) {
             return;
         }
-        final String newAccessToken = jwtService.generateToken(user);
+        final String newAccessToken = jwtService.generateAccessToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, newAccessToken);
         var authResponse = AuthenticationResponse
@@ -141,7 +141,7 @@ public class AuthenticationService {
         if (email == null) {
             return null;
         }
-        return this.repository.findByEmail(email).orElse(null);
+        return this.userRepository.findByEmail(email).orElse(null);
     }
 
     public AuthenticationResponse authenticateByToken(HttpServletRequest request) {
