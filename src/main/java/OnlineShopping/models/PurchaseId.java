@@ -1,6 +1,8 @@
 package OnlineShopping.models;
 
-public class PurchaseId {
+import java.io.Serializable;
+
+public class PurchaseId implements Serializable {
     private Long deal;
     private Long product;
 
@@ -8,20 +10,5 @@ public class PurchaseId {
         this.deal = deal;
         this.product = product;
     }
-
-    public Long getDeal() {
-        return deal;
-    }
-
-    public void setDeal(Long deal) {
-        this.deal = deal;
-    }
-
-    public Long getProduct() {
-        return product;
-    }
-
-    public void setProduct(Long product) {
-        this.product = product;
-    }
+    public PurchaseId() {}
 }
