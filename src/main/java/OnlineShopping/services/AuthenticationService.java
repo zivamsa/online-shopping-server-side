@@ -31,7 +31,6 @@ public class AuthenticationService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-//    private final AuthenticationManager authenticationManager;
     private final TokenRepository tokenRepository;
 
 
@@ -62,12 +61,6 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse login(LoginRequest request) {
-//        authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        request.getEmail(),
-//                        request.getPassword()
-//                )
-//        );
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -113,7 +106,7 @@ public class AuthenticationService {
         return refreshToken;
     }
 
-    private String extractHeaderAccessToken(HttpServletRequest request) {
+    public String extractHeaderAccessToken(HttpServletRequest request) {
         final String prefix = "Bearer ";
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith(prefix)) {
@@ -156,11 +149,5 @@ public class AuthenticationService {
         final String token = extractHeaderAccessToken(request);
         if (token == "") return null;
         return getUserByToken(token);
-    }
-
-    public boolean isUserAdmin(HttpServletRequest request) {
-        User user = getUserByRequest(request);
-        if (user == null) return false;
-        return user.isAdmin();
     }
 }

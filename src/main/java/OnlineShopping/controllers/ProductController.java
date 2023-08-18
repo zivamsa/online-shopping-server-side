@@ -1,7 +1,6 @@
 package OnlineShopping.controllers;
 
 import OnlineShopping.models.Product;
-import OnlineShopping.services.AuthenticationService;
 import OnlineShopping.exceptions.LackingPermissions;
 import OnlineShopping.services.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,9 +15,6 @@ public class ProductController {
     @Autowired
     ProductService productService;
 
-    @Autowired
-    AuthenticationService authenticationService;
-
     @GetMapping("/products")
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
@@ -30,24 +26,12 @@ public class ProductController {
     }
 
     @PostMapping("/product")
-    public Product addProduct(
-            @RequestBody Product product,
-            HttpServletRequest request
-    ) throws LackingPermissions {
-        if (!authenticationService.isUserAdmin(request)) {
-            throw new LackingPermissions();
-        }
+    public Product addProduct(@RequestBody Product product) {
         return productService.saveOrUpdate(product);
     }
 
     @PutMapping("/product")
-    public Product updateProduct(
-            @RequestBody Product product,
-            HttpServletRequest request
-    ) throws LackingPermissions {
-        if (!authenticationService.isUserAdmin(request)) {
-            throw new LackingPermissions();
-        }
+    public Product updateProduct(@RequestBody Product product) {
         return productService.saveOrUpdate(product);
     }
 }

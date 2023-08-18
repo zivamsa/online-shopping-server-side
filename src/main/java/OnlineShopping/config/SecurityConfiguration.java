@@ -1,8 +1,10 @@
 package OnlineShopping.config;
 
+import OnlineShopping.models.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,31 +27,38 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-        http
-                .cors()
+        // allow cors, disable csrf
+        http = http.cors()
                 .and()
                     .csrf()
-                    .disable()
-                    .authorizeHttpRequests()
-                    .requestMatchers("/auth/**",
-                            "/product/**",
-                            "/deal/**",
-                            "/user/**",
-                            "/purchase/**")
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated()
-                .and()
-                    .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                    .authenticationProvider(authenticationProvider)
-                        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout()
-                    .logoutUrl("/auth/logout")
-                    .addLogoutHandler(logoutHandler)
-                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
-                    .invalidateHttpSession(true);
+                    .disable();
+        // session management
+        http = http.sessionManagement()
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .and();
+        // jwt token filter
+        http = http
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        // endpoint permissions
+        http.authorizeHttpRequests()
+                .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/product/**").hasAuthority("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/product/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/product/**").hasRole("ADMIN")
+                .requestMatchers("/auth/**",
+                        "/deal/**",
+                        "/user/**",
+                        "/purchase/**")
+                .permitAll()
+                .anyRequest()
+                .authenticated();
+        // logout handler
+        http.logout()
+                .logoutUrl("/auth/logout")
+                .addLogoutHandler(logoutHandler)
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
+                .invalidateHttpSession(true);
 
         
         return http.build();
