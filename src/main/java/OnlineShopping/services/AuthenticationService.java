@@ -31,7 +31,7 @@ public class AuthenticationService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
+//    private final AuthenticationManager authenticationManager;
     private final TokenRepository tokenRepository;
 
 
@@ -62,12 +62,12 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+//        authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(
+//                        request.getEmail(),
+//                        request.getPassword()
+//                )
+//        );
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -130,7 +130,7 @@ public class AuthenticationService {
         return this.userRepository.findByEmail(email).orElse(null);
     }
 
-    private Optional<Token> queryRefreshToken(User user) {
+    public Optional<Token> queryRefreshToken(User user) {
         return tokenRepository
                 .findByUser(user)
                 .stream().filter((currDBToken)->!currDBToken.isExpired())
