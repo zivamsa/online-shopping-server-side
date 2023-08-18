@@ -48,5 +48,12 @@ public class DealService {
             purchase.setDeal(deal);
         });
         repository.save(deal);
+
+        mappedPurchases.stream()
+                .forEach((purchase) -> {
+                    var product = purchase.getProduct();
+                    product.setStock(product.getStock() - purchase.getAmount());
+                    productService.saveOrUpdate(product);
+                });
     }
 }
