@@ -32,7 +32,6 @@ public class LogoutService implements LogoutHandler {
         Optional<Token> resToken = authenticationService.queryRefreshToken(user);
         if (resToken.isEmpty()) return;
         Token token = resToken.get();
-        System.out.println("Token found- " + token.refreshToken);
         token.expiryDate = new Date();
 
         tokenRepository.save(token);
