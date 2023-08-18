@@ -23,7 +23,7 @@ public class Deals {
     @JoinColumn(name="username")
     private User user;
 
-    @OneToMany(mappedBy = "deal")
+    @OneToMany(mappedBy = "deal", cascade = CascadeType.ALL)
     private List<Purchases> purchases;
 
 }

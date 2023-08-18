@@ -44,7 +44,9 @@ public class DealService {
         }).toList();
 
         var deal = Deals.builder().user(user).purchases(mappedPurchases).build();
-        // TODO: figure out why purchases aren't saved
+        deal.getPurchases().forEach((purchase) -> {
+            purchase.setDeal(deal);
+        });
         repository.save(deal);
     }
 }
