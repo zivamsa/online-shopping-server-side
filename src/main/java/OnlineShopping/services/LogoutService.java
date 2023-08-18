@@ -1,4 +1,4 @@
-package OnlineShopping.config;
+package OnlineShopping.services;
 
 import OnlineShopping.models.Token;
 import OnlineShopping.models.User;
