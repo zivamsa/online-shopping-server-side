@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,4 +22,8 @@ public class Deals {
     @ManyToOne
     @JoinColumn(name="username")
     private User user;
+
+    @OneToMany(mappedBy = "deal")
+    private List<Purchases> purchases;
+
 }

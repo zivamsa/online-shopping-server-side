@@ -27,5 +27,5 @@ public class Purchases {
     @Column
     private int amount;
     @Column
-    private int price;
+    private double price;
 }
