@@ -54,9 +54,11 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .role(savedUser.getRole())
                 .firstname(savedUser.getFirstname())
                 .lastname(savedUser.getLastname())
-                .role(savedUser.getRole())
+                .address(savedUser.getAddress())
+                .email(savedUser.getEmail())
                 .build();
     }
 
@@ -75,9 +77,11 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .role(user.getRole())
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
-                .role(user.getRole())
+                .address(user.getAddress())
+                .email(user.getEmail())
                 .build();
     }
 
@@ -137,11 +141,13 @@ public class AuthenticationService {
         if (user == null) return null;
         String refreshToken = queryRefreshToken(user).orElseThrow().refreshToken;
         return AuthenticationResponse.builder()
-                .firstname(user.getFirstname())
-                .lastname(user.getLastname())
                 .role(user.getRole())
                 .accessToken(token)
                 .refreshToken(refreshToken)
+                .firstname(user.getFirstname())
+                .lastname(user.getLastname())
+                .address(user.getAddress())
+                .email(user.getEmail())
                 .build();
     }
 
