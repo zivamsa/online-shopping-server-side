@@ -43,7 +43,7 @@ public class AuthenticationController {
                                              HttpServletResponse response) {
         var out = service.authenticateByToken(request);
         if (out == null) {
-            return (ResponseEntity<?>) ResponseEntity.notFound();
+            return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(out);
     }
