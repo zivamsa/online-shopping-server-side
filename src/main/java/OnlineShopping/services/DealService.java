@@ -56,4 +56,8 @@ public class DealService {
                     productService.saveOrUpdate(product);
                 });
     }
+
+    public List<Deals> getUserDeals(User user) {
+        return repository.findByUser(user);
+    }
 }

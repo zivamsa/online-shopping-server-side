@@ -1,5 +1,6 @@
 package OnlineShopping.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 public class Purchases {
     @Id
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name="deal_id")
     private Deals deal;
 

@@ -1,5 +1,6 @@
 package OnlineShopping.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,9 +18,10 @@ import java.util.List;
 public class Deals {
     @Id
     @GeneratedValue
-    private Long deal_id;
+    private Long dealId;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name="username")
     private User user;
 
