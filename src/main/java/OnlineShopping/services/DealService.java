@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -43,7 +44,11 @@ public class DealService {
                     .build();
         }).toList();
 
-        var deal = Deals.builder().user(user).purchases(mappedPurchases).build();
+        var deal = Deals.builder()
+                .user(user)
+                .purchases(mappedPurchases)
+                .commitDate(new Date())
+                .build();
         deal.getPurchases().forEach((purchase) -> {
             purchase.setDeal(deal);
         });
