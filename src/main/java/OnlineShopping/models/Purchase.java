@@ -25,8 +25,6 @@ public class Purchase {
     @JoinColumn(name="product_id")
     private Product product;
 
-    @Column
     private int amount;
-    @Column
     private double price;
 }

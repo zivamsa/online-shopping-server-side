@@ -17,12 +17,8 @@ public class Product {
     @GeneratedValue
     private Long id;
 
-    @Column
     private String title;
-    @Column
     private String description;
-    @Column
     private int stock;
-    @Column
     private double price;
 }

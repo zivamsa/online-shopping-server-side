@@ -26,26 +26,17 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id")
     private Integer id;
-
-    @Column
     private String password;
 
-    @Column
     private String email;
-
-    @Column
     private String address;
-
     private String firstName;
-
     private String lastName;
 
     @Enumerated(EnumType.STRING)
-    @Column
     private Role role;
 
     @OneToMany(mappedBy = "user")
-    @Column
     private List<Token> tokens;
 
     @Override
