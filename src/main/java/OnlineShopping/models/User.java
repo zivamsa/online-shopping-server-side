@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = @Index(name = "email_index", columnList = "email", unique = true))
 @NamedQuery(name = "User.findByEmail",
         query = "SELECT u FROM User u WHERE u.email = ?1")
 @SequenceGenerator(name = "user_id", sequenceName = "user_sequence")
@@ -30,7 +30,7 @@ public class User implements UserDetails {
     @Column
     private String password;
 
-    @Column(unique = true)
+    @Column
     private String email;
 
     @Column
