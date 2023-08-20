@@ -16,7 +16,8 @@ public class UserService {
     public List<User> getAllUsers(){
         return repository.findAll();
     }
-    public void saveOrUpdate(User user) {
-        repository.save(user);
+    public User saveOrUpdate(User user) {
+        return repository.save(user);
     }
+
 }
