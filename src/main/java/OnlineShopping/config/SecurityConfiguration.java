@@ -47,6 +47,7 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.POST, "/product/**").hasAuthority("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/product/**").hasAuthority("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/deal/").hasAuthority("USER")
+                .requestMatchers(HttpMethod.GET, "/user/").hasAuthority("ADMIN")
                 .requestMatchers("/auth/**",
                         "/deal/**",
                         "/user/**",

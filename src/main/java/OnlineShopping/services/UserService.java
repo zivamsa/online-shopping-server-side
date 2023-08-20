@@ -13,14 +13,8 @@ public class UserService {
     @Autowired
     UserRepository repository;
 
-    public User getUserById(Integer id) {
-        return repository.findById(id).get();
-    }
-
     public List<User> getAllUsers(){
-        List<User> users = new ArrayList<User>();
-        repository.findAll().forEach(user -> users.add(user));
-        return users;
+        return repository.findAll();
     }
     public void saveOrUpdate(User user) {
         repository.save(user);

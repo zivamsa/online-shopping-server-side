@@ -53,8 +53,8 @@ public class AuthenticationService {
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .role(savedUser.getRole())
-                .firstname(savedUser.getFirstName())
-                .lastname(savedUser.getLastName())
+                .firstName(savedUser.getFirstName())
+                .lastName(savedUser.getLastName())
                 .address(savedUser.getAddress())
                 .email(savedUser.getEmail())
                 .build();
@@ -76,8 +76,8 @@ public class AuthenticationService {
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .role(user.getRole())
-                .firstname(user.getFirstName())
-                .lastname(user.getLastName())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .address(user.getAddress())
                 .email(user.getEmail())
                 .build();
@@ -142,8 +142,8 @@ public class AuthenticationService {
                 .role(user.getRole())
                 .accessToken(token)
                 .refreshToken(refreshToken)
-                .firstname(user.getFirstName())
-                .lastname(user.getLastName())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .address(user.getAddress())
                 .email(user.getEmail())
                 .build();
