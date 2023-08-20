@@ -7,28 +7,26 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "deals")
-public class Deals {
+@IdClass(PurchaseId.class)
+public class Purchase {
     @Id
-    @GeneratedValue
-    private Long dealId;
-
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="username")
-    private User user;
+    @JoinColumn(name="deal_id")
+    private Deal deal;
 
-    private Date commitDate;
+    @Id
+    @ManyToOne
+    @JoinColumn(name="product_id")
+    private Product product;
 
-    @OneToMany(mappedBy = "deal", cascade = CascadeType.ALL)
-    private List<Purchases> purchases;
-
+    @Column
+    private int amount;
+    @Column
+    private double price;
 }

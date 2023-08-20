@@ -1,7 +1,7 @@
 package OnlineShopping.controllers;
 
 import OnlineShopping.dto.CheckoutRequest;
-import OnlineShopping.models.Deals;
+import OnlineShopping.models.Deal;
 import OnlineShopping.models.Role;
 import OnlineShopping.services.AuthenticationService;
 import OnlineShopping.services.DealService;
@@ -22,14 +22,14 @@ public class DealController {
     AuthenticationService authenticationService;
 
     @GetMapping("/deal/{id}")
-    public Deals getDealById(@PathVariable("id") Long id) {
+    public Deal getDealById(@PathVariable("id") Long id) {
         return dealService.getDealById(id);
     }
 
     @GetMapping("/")
-    public List<Deals> deals(HttpServletRequest request) {
+    public List<Deal> deals(HttpServletRequest request) {
         var user = authenticationService.getUserByRequest(request);
-        if (user == null) return new ArrayList<Deals>();
+        if (user == null) return new ArrayList<Deal>();
         if (user.getRole() == Role.ADMIN) {
             return dealService.getAllDeals();
         } else {

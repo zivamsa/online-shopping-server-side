@@ -14,8 +14,6 @@ import OnlineShopping.models.Token;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,8 +39,8 @@ public class AuthenticationService {
             throw new UserEmailAlreadyRegistered("User with this email already exists");
         }
         User user = User.builder()
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
+                .firstName(request.getFirstname())
+                .lastName(request.getLastname())
                 .email(request.getEmail())
                 .address(request.getAddress())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -55,8 +53,8 @@ public class AuthenticationService {
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .role(savedUser.getRole())
-                .firstname(savedUser.getFirstname())
-                .lastname(savedUser.getLastname())
+                .firstname(savedUser.getFirstName())
+                .lastname(savedUser.getLastName())
                 .address(savedUser.getAddress())
                 .email(savedUser.getEmail())
                 .build();
@@ -78,8 +76,8 @@ public class AuthenticationService {
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .role(user.getRole())
-                .firstname(user.getFirstname())
-                .lastname(user.getLastname())
+                .firstname(user.getFirstName())
+                .lastname(user.getLastName())
                 .address(user.getAddress())
                 .email(user.getEmail())
                 .build();
@@ -144,8 +142,8 @@ public class AuthenticationService {
                 .role(user.getRole())
                 .accessToken(token)
                 .refreshToken(refreshToken)
-                .firstname(user.getFirstname())
-                .lastname(user.getLastname())
+                .firstname(user.getFirstName())
+                .lastname(user.getLastName())
                 .address(user.getAddress())
                 .email(user.getEmail())
                 .build();

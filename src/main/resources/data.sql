@@ -1,5 +1,5 @@
 -- Create admin user if doesn't exist
-INSERT INTO users (id, role, email, password, firstname, lastname, address)
+INSERT INTO users (id, role, email, password, first_name, last_name, address)
     SELECT nextval( 'user_sequence' ),
            'ADMIN',
            'admin@gmail.com',

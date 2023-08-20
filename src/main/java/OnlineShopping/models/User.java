@@ -36,11 +36,9 @@ public class User implements UserDetails {
     @Column
     private String address;
 
-    @Column
-    private String firstname;
+    private String firstName;
 
-    @Column
-    private String lastname;
+    private String lastName;
 
     @Enumerated(EnumType.STRING)
     @Column
