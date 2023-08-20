@@ -20,10 +20,11 @@ import java.util.List;
 @Table(name = "users")
 @NamedQuery(name = "User.findByEmail",
         query = "SELECT u FROM User u WHERE u.email = ?1")
+@SequenceGenerator(name = "user_id", sequenceName = "user_sequence")
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id")
     private Integer id;
 
     @Column
