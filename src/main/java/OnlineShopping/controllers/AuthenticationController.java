@@ -5,6 +5,7 @@ import OnlineShopping.exceptions.UserEmailAlreadyRegistered;
 import OnlineShopping.services.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,14 +22,14 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request
+            @Valid @RequestBody RegisterRequest request
     ) throws UserEmailAlreadyRegistered {
         return ResponseEntity.ok(service.register(request));
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody LoginRequest request
+            @Valid @RequestBody LoginRequest request
     ) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -40,7 +41,7 @@ public class AuthenticationController {
     }
     @GetMapping("/authenticate")
     public ResponseEntity<?> authenticate(HttpServletRequest request,
-                                             HttpServletResponse response) {
+                                          HttpServletResponse response) {
         var out = service.authenticateByToken(request);
         if (out == null) {
             return ResponseEntity.notFound().build();
@@ -50,7 +51,7 @@ public class AuthenticationController {
 
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(
-            @RequestBody TokenRefreshRequest request
+            @Valid @RequestBody TokenRefreshRequest request
     ) {
         final String refreshToken = request.getRefreshToken();
         try {
