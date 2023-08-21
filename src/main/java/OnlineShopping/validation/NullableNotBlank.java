@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 
 public @interface NullableNotBlank {
-    String message() default "Can't be empty";
+    String message() default "must not be blank";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 

@@ -20,7 +20,12 @@ import java.util.List;
 @ControllerAdvice
 public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request
+    ) {
         List<String> errors = new ArrayList<>();
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.add(error.getField() + "- " + error.getDefaultMessage());
@@ -33,16 +38,15 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({ ConstraintViolationException.class })
-    public ResponseEntity<Object> handleConstraintViolation(
-            ConstraintViolationException ex, WebRequest request) {
-        List<String> errors = new ArrayList<String>();
+    public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex) {
+        List<String> errors = new ArrayList<>();
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
             errors.add(violation.getPropertyPath() + ": " + violation.getMessage());
         }
 
         ApiError apiError =
                 new ApiError(HttpStatus.BAD_REQUEST, errors);
-        return new ResponseEntity<Object>(
+        return new ResponseEntity<>(
                 apiError, new HttpHeaders(), apiError.getStatus());
     }
 
