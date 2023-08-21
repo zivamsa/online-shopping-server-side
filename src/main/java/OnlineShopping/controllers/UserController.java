@@ -25,13 +25,7 @@ public class UserController {
     }
 
     @PutMapping("/")
-    public ResponseEntity<?> updateUser(@Valid @RequestBody User user, BindingResult bindingResult) {
-        Optional<ObjectError> error = bindingResult.getAllErrors().stream().findFirst();
-        if (error.isPresent()) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(error.get().getDefaultMessage());
-        }
+    public ResponseEntity<?> updateUser(@Valid @RequestBody User user) {
         User updated = userService.updateUser(user);
         return ResponseEntity.ok(updated);
     }
