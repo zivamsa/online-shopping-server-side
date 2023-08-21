@@ -20,6 +20,6 @@ public class UserController {
 
     @PutMapping("/")
     public User updateUser(@RequestBody User user) {
-        return userService.saveOrUpdate(user);
+        return userService.updateUser(user);
     }
 }
