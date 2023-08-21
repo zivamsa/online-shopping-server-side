@@ -1,5 +1,6 @@
 package OnlineShopping.services;
 
+import OnlineShopping.dto.PayloadUser;
 import OnlineShopping.models.User;
 import OnlineShopping.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,32 +22,27 @@ public class UserService {
         return repository.save(user);
     }
 
-    public User updateUser(User updated) {
+    public User updateUser(PayloadUser updated) {
         User existing = repository.findById(updated.getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        updated.setPassword(existing.getPassword());
-        if (updated.getRole() == null) {
-            updated.setRole(existing.getRole());
+        if (updated.getRole() != null) {
+            existing.setRole(updated.getRole());
         }
-        if (updated.getAddress() == null) {
-            updated.setAddress(existing.getAddress());
+        if (updated.getAddress() != null) {
+            existing.setAddress(updated.getAddress());
         }
-        if (updated.getRole() == null) {
-            updated.setRole(existing.getRole());
+        if (updated.getEmail() != null) {
+            existing.setEmail(updated.getEmail());
         }
-        if (updated.getFirstName() == null) {
-            updated.setFirstName(existing.getFirstName());
+        if (updated.getFirstName() != null) {
+            existing.setFirstName(updated.getFirstName());
         }
-        if (updated.getLastName() == null) {
-            updated.setLastName(existing.getLastName());
-        }
-        if (updated.getEmail() == null) {
-            updated.setEmail(existing.getEmail());
+        if (updated.getLastName() != null) {
+            existing.setLastName(updated.getLastName());
         }
 
-        User output = repository.save(updated);
-        output.setPassword("");
+        User output = repository.save(existing);
 
         return output;
     }
