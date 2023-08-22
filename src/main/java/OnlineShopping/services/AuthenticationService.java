@@ -39,8 +39,8 @@ public class AuthenticationService {
             throw new UserEmailAlreadyRegistered("User with this email already exists");
         }
         User user = User.builder()
-                .firstName(request.getFirstname())
-                .lastName(request.getLastname())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
                 .email(request.getEmail())
                 .address(request.getAddress())
                 .password(passwordEncoder.encode(request.getPassword()))
