@@ -2,6 +2,8 @@ package OnlineShopping.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,11 +30,17 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id")
     private Integer id;
     @JsonIgnore
+    @NotBlank
     private String password;
 
+    @NotBlank
+    @Email(message = "Email is not valid", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
     private String email;
+    @NotBlank
     private String address;
+    @NotBlank
     private String firstName;
+    @NotBlank
     private String lastName;
 
     @Enumerated(EnumType.STRING)

@@ -4,6 +4,7 @@ import OnlineShopping.models.Product;
 import OnlineShopping.exceptions.LackingPermissions;
 import OnlineShopping.services.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,12 +27,12 @@ public class ProductController {
     }
 
     @PostMapping("/product")
-    public Product addProduct(@RequestBody Product product) {
+    public Product addProduct(@Valid @RequestBody Product product) {
         return productService.saveOrUpdate(product);
     }
 
     @PutMapping("/product")
-    public Product updateProduct(@RequestBody Product product) {
+    public Product updateProduct(@Valid @RequestBody Product product) {
         return productService.saveOrUpdate(product);
     }
 }

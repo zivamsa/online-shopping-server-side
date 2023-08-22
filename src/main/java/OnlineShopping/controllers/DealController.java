@@ -6,6 +6,7 @@ import OnlineShopping.models.Role;
 import OnlineShopping.services.AuthenticationService;
 import OnlineShopping.services.DealService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +39,7 @@ public class DealController {
     }
 
     @PostMapping("/")
-    public void createDeal(@RequestBody List<CheckoutRequest> purchases,
+    public void createDeal(@Valid @RequestBody List<CheckoutRequest> purchases,
                            HttpServletRequest request) {
         var user = authenticationService.getUserByRequest(request);
         dealService.createDeal(purchases, user);

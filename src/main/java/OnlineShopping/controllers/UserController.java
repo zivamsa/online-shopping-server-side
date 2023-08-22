@@ -1,8 +1,11 @@
 package OnlineShopping.controllers;
 
+import OnlineShopping.dto.PayloadUser;
 import OnlineShopping.models.User;
 import OnlineShopping.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +22,8 @@ public class UserController {
     }
 
     @PutMapping("/")
-    public User updateUser(@RequestBody User user) {
-        return userService.saveOrUpdate(user);
+    public ResponseEntity<?> updateUser(@Valid @RequestBody PayloadUser user) {
+        User updated = userService.updateUser(user);
+        return ResponseEntity.ok(updated);
     }
 }

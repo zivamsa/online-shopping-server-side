@@ -2,6 +2,7 @@ package OnlineShopping.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class Purchase {
     @JoinColumn(name="product_id")
     private Product product;
 
+    @Min(1)
     private int amount;
     private double price;
 }
