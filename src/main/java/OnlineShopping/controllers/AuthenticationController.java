@@ -1,15 +1,20 @@
 package OnlineShopping.controllers;
 
 import OnlineShopping.dto.*;
+import OnlineShopping.exceptions.ApiError;
 import OnlineShopping.exceptions.UserEmailAlreadyRegistered;
 import OnlineShopping.services.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,20 +33,33 @@ public class AuthenticationController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(
+    public ResponseEntity<?> authenticate(
             @Valid @RequestBody LoginRequest request
     ) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (AuthenticationException ex) {
+            final String errorMessage;
+            if (ex instanceof UsernameNotFoundException) {
+                errorMessage = "Invalid Username";
+            } else if (ex instanceof BadCredentialsException) {
+                errorMessage = "Invalid Credentials";
+            } else {
+                errorMessage = "Authentication Error";
+            }
+            ApiError error = new ApiError(HttpStatus.BAD_REQUEST, errorMessage);
+            return new ResponseEntity<>(error, error.getStatus());
+        }
+
         return ResponseEntity.ok(service.login(request));
     }
     @GetMapping("/authenticate")
-    public ResponseEntity<?> authenticate(HttpServletRequest request,
-                                          HttpServletResponse response) {
+    public ResponseEntity<?> authenticate(HttpServletRequest request) {
         var out = service.authenticateByToken(request);
         if (out == null) {
             return ResponseEntity.notFound().build();
