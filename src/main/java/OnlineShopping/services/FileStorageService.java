@@ -20,7 +20,10 @@ public class FileStorageService {
 
     public boolean storeFile(MultipartFile file) {
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
+        return storeFile(file, filename);
+    }
 
+    public boolean storeFile(MultipartFile file, String filename) {
         Path filePath = Paths.get(uploadDirectory).resolve(filename);
 
         try {
