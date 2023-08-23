@@ -7,6 +7,7 @@ import OnlineShopping.services.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,9 +32,26 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
-    @PostMapping("/product")
-    public Product addProduct(@Valid @RequestBody Product product) {
-        return productService.saveOrUpdate(product);
+    @PostMapping(path = "/product", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public Product addProduct(
+            @Valid @RequestPart Product product,
+            @RequestPart(required = false) MultipartFile file
+    ){
+        //      INPUT FORMAT: form-data
+        //      file: file
+        //      product: Product in json format (as string)- use Content-Type: application/json on this field
+        final Product savedProduct = productService.saveOrUpdate(product);
+
+        // TODO: maybe- store images as an entity, connect to the product
+        // TODO: check that the file is an image
+        // TODO: upload file in update as well
+        // TODO: change field name to image instead of file
+        // TODO: return the image to the client(@Transient maybe)
+        if (file != null) {
+            fileStorageService.storeFile(file);
+        }
+
+        return savedProduct;
     }
 
     @PutMapping("/product")
