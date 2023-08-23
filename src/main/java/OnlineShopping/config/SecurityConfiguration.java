@@ -42,6 +42,7 @@ public class SecurityConfiguration {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         // endpoint permissions
         http.authorizeHttpRequests()
+                .requestMatchers("/images/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/product/**").hasAuthority("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/product/**").permitAll()

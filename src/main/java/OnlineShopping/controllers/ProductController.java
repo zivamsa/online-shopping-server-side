@@ -2,11 +2,13 @@ package OnlineShopping.controllers;
 
 import OnlineShopping.models.Product;
 import OnlineShopping.exceptions.LackingPermissions;
+import OnlineShopping.services.FileStorageService;
 import OnlineShopping.services.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,6 +17,9 @@ import java.util.List;
 public class ProductController {
     @Autowired
     ProductService productService;
+
+    @Autowired
+    FileStorageService fileStorageService;
 
     @GetMapping("/products")
     public List<Product> getAllProducts() {
@@ -34,5 +39,10 @@ public class ProductController {
     @PutMapping("/product")
     public Product updateProduct(@Valid @RequestBody Product product) {
         return productService.saveOrUpdate(product);
+    }
+
+    @PostMapping("/image")
+    public boolean testImage(@RequestParam("file") MultipartFile file) {
+        return fileStorageService.storeFile(file);
     }
 }
