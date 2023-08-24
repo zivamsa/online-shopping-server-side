@@ -54,7 +54,9 @@ public class FileStorageService {
     private boolean isImage(MultipartFile file) {
         try {
             InputStream stream = file.getInputStream();
-            return ImageIO.read(stream) != null;
+            boolean success = ImageIO.read(stream) != null;
+            stream.close();
+            return success;
         } catch (IOException ex) {
             return false;
         }
