@@ -1,12 +1,12 @@
 package OnlineShopping.controllers;
 
 import OnlineShopping.models.Product;
-import OnlineShopping.exceptions.LackingPermissions;
 import OnlineShopping.services.ProductService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,13 +26,22 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
-    @PostMapping("/product")
-    public Product addProduct(@Valid @RequestBody Product product) {
-        return productService.saveOrUpdate(product);
+    @PostMapping(path = "/product", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public Product addProduct(
+            @RequestPart(name = "product") @Valid Product product,
+            @RequestPart(name = "image", required = false) MultipartFile image
+    ) {
+        //      INPUT FORMAT: form-data
+        //      image: image
+        //      product: Product in json format (as string)- use Content-Type: application/json on this field
+        return productService.saveProduct(product, image);
     }
 
     @PutMapping("/product")
-    public Product updateProduct(@Valid @RequestBody Product product) {
-        return productService.saveOrUpdate(product);
+    public Product updateProduct(
+            @RequestPart(name = "product") @Valid Product product,
+            @RequestPart(name = "image", required = false) MultipartFile image
+    ) {
+        return productService.updateProduct(product, image);
     }
 }
