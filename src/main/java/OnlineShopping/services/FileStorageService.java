@@ -10,10 +10,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 
 @Service
 public class FileStorageService {
@@ -30,6 +27,7 @@ public class FileStorageService {
             throw new Error("Product image with no file extension");
         }
 
+        removePreviousProductImage(productId);
         String filename = String.format("%s.%s", productId.toString(), extension);
 
         String uploadedPath = storeFile(image, String.format("product/%s", filename));
@@ -73,9 +71,39 @@ public class FileStorageService {
         }
     }
 
-    private String getFileExtension(MultipartFile file) {
-        var fileParts = file.getOriginalFilename().split("\\.");
+
+    private void removePreviousProductImage(Long productId) {
+        String productIdStr = productId.toString();
+        Path directory = Paths.get(uploadDirectory + "/product");
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory)) {
+            for (Path file : stream) {
+                if (Files.isRegularFile(file)) {
+                    String fileName = file.getFileName().toString();
+                    String baseName = getFileName(fileName);
+
+                    if (baseName.equals(productIdStr)) {
+                        Files.delete(file);
+                    }
+                }
+            }
+        } catch (IOException ex) {
+        }
+
+    }
+
+    private String getFileExtension(String fileNameExt) {
+        var fileParts = fileNameExt.split("\\.");
         if (fileParts.length == 0) return null;
         return fileParts[fileParts.length - 1];
+    }
+
+    private String getFileExtension(MultipartFile file) {
+        return getFileExtension(file.getOriginalFilename());
+    }
+
+    private String getFileName(String fileNameExt) {
+        var fileParts = fileNameExt.split("\\.");
+        if (fileParts.length == 0) return null;
+        return fileParts[0];
     }
 }
