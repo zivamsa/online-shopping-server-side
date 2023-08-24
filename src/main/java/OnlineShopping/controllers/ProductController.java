@@ -34,21 +34,19 @@ public class ProductController {
 
     @PostMapping(path = "/product", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public Product addProduct(
-            @Valid @RequestPart Product product,
-            @RequestPart(required = false) MultipartFile file
+            @RequestPart(name="product") @Valid Product product,
+            @RequestPart(name="image", required = false) MultipartFile image
     ){
         //      INPUT FORMAT: form-data
-        //      file: file
+        //      image: image
         //      product: Product in json format (as string)- use Content-Type: application/json on this field
         final Product savedProduct = productService.saveOrUpdate(product);
 
         // TODO: maybe- store images as an entity, connect to the product
-        // TODO: check that the file is an image
         // TODO: upload file in update as well
-        // TODO: change field name to image instead of file
         // TODO: return the image to the client(@Transient maybe)
-        if (file != null) {
-            fileStorageService.storeFile(file);
+        if (image != null) {
+            fileStorageService.uploadProduct(image, savedProduct.getId());
         }
 
         return savedProduct;
@@ -57,10 +55,5 @@ public class ProductController {
     @PutMapping("/product")
     public Product updateProduct(@Valid @RequestBody Product product) {
         return productService.saveOrUpdate(product);
-    }
-
-    @PostMapping("/image")
-    public boolean testImage(@RequestParam("file") MultipartFile file) {
-        return fileStorageService.storeFile(file);
     }
 }
