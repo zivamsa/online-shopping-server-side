@@ -28,19 +28,37 @@ public class ProductService {
         repository.findAll().forEach(product -> products.add(product));
         return products;
     }
-    public Product saveOrUpdate(Product product, MultipartFile image) {
-        // TODO: maybe- store images as an entity, connect to the product
-        // TODO: return the image to the client(@Transient maybe)
 
-        Product savedProduct = repository.save(product);
+    public Product saveProduct(Product product, MultipartFile image) {
+        product.setId(null);
+        // this ensures that the file must be uploaded- could remove this to allow upload by url
+        product.setImagePath(null);
+        Product saved = saveOrUpdate(product);
+
+        String imagePath = null;
         if (image != null) {
-            fileStorageService.uploadProduct(image, savedProduct.getId());
+            imagePath = fileStorageService.uploadProduct(image, saved.getId());
+        }
+        product.setImagePath(imagePath);
+
+        return saveOrUpdate(product);
+    }
+
+    public Product updateProduct(Product product, MultipartFile image) {
+        String imagePath;
+        if (image == null) {
+            // this ensures that the file must be uploaded- could remove this to allow upload by url
+            Product existing = repository.findById(product.getId()).orElseThrow(() -> new Error("Product does not exist!"));
+            imagePath = existing.getImagePath();
+        } else {
+            imagePath = fileStorageService.uploadProduct(image, product.getId());
         }
 
-        return savedProduct;
+        product.setImagePath(imagePath);
+        return saveOrUpdate(product);
     }
 
     public Product saveOrUpdate(Product product) {
-        return saveOrUpdate(product, null);
+        return repository.save(product);
     }
 }

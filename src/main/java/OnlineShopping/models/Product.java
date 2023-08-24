@@ -1,6 +1,7 @@
 package OnlineShopping.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -24,4 +25,7 @@ public class Product {
     private String description;
     private int stock;
     private double price;
+
+    @Nullable
+    private String imagePath;
 }

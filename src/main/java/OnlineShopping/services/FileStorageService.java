@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.imageio.ImageIO;
 import java.io.IOException;
@@ -20,34 +21,44 @@ public class FileStorageService {
     @Value("${upload.directory}")
     private String uploadDirectory;
 
-    public boolean uploadProduct(MultipartFile image, Long productId) {
+    public String uploadProduct(MultipartFile image, Long productId) {
         if (!isImage(image)) {
             throw new Error("Product preview must be an image!");
         }
         String extension = getFileExtension(image);
         if (extension == null) {
-            return false;
+            throw new Error("Product image with no file extension");
         }
 
         String filename = String.format("%s.%s", productId.toString(), extension);
 
-        return storeFile(image, String.format("product/%s", filename));
+        String uploadedPath = storeFile(image, String.format("product/%s", filename));
+        if (uploadedPath == null) {
+            throw new Error("Error while saving image");
+        }
+
+
+        String parsedPath = uploadedPath
+                .replace('\\', '/')
+                .replaceFirst(uploadDirectory, "image"); // exposed resource;
+        String host = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        return String.format("%s/%s", host, parsedPath);
     }
 
-    private boolean storeFile(MultipartFile file) {
+    private String storeFile(MultipartFile file) {
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
         return storeFile(file, filename);
     }
 
-    private boolean storeFile(MultipartFile file, String filename) {
+    private String storeFile(MultipartFile file, String filename) {
         Path filePath = Paths.get(uploadDirectory).resolve(filename);
 
         try {
             Files.createDirectories(filePath.getParent());
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            return true;
+            return filePath.toString();
         } catch (IOException ex) {
-            return false;
+            return null;
         }
     }
 

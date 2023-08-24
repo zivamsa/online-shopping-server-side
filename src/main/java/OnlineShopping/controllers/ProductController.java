@@ -34,7 +34,7 @@ public class ProductController {
         //      INPUT FORMAT: form-data
         //      image: image
         //      product: Product in json format (as string)- use Content-Type: application/json on this field
-        return productService.saveOrUpdate(product, image);
+        return productService.saveProduct(product, image);
     }
 
     @PutMapping("/product")
@@ -42,6 +42,6 @@ public class ProductController {
             @RequestPart(name = "product") @Valid Product product,
             @RequestPart(name = "image", required = false) MultipartFile image
     ) {
-        return productService.saveOrUpdate(product, image);
+        return productService.updateProduct(product, image);
     }
 }
