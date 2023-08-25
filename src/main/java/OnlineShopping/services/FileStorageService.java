@@ -36,16 +36,17 @@ public class FileStorageService {
         }
 
 
-        String parsedPath = uploadedPath
+        return uploadedPath
                 .replace('\\', '/')
                 .replaceFirst(uploadDirectory, "image"); // exposed resource;
-        String host = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-        return String.format("%s/%s", host, parsedPath);
     }
 
     public String productImagePath(String fileName) {
-        String host = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-        return String.format("%s/%s/%s/%s", host, "image", "product", fileName);
+        return String.format("%s/%s/%s", "image", "product", fileName);
+    }
+
+    public String getHost() {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
     }
 
 

@@ -9,7 +9,6 @@ import OnlineShopping.repository.DealsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -25,8 +24,8 @@ public class DealService {
     }
 
     public List<Deal> getAllDeals() {
-        List<Deal> deals = new ArrayList<Deal>();
-        repository.findAll().forEach(deal -> deals.add(deal));
+        List<Deal> deals = repository.findAll();
+        deals.forEach(this::prefixProductImage);
         return deals;
     }
 
@@ -63,6 +62,17 @@ public class DealService {
     }
 
     public List<Deal> getUserDeals(User user) {
-        return repository.findByUser(user);
+        List<Deal> deals = repository.findByUser(user);
+        deals.forEach(this::prefixProductImage);
+        return deals;
+    }
+
+    private void prefixProductImage(Deal deal) {
+        List<Purchase> purchases = deal.getPurchases();
+        purchases.forEach(purchase -> {
+            Product before = purchase.getProduct();
+            Product after = productService.prefixProductPath(before);
+            purchase.setProduct(after);
+        });
     }
 }

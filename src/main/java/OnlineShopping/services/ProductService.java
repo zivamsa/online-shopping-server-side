@@ -24,8 +24,8 @@ public class ProductService {
     }
 
     public List<Product> getAllProducts(){
-        List<Product> products = new ArrayList<Product>();
-        repository.findAll().forEach(product -> products.add(product));
+        List<Product> products = repository.findAll();
+        products.forEach(this::prefixProductPath);
         return products;
     }
 
@@ -61,6 +61,16 @@ public class ProductService {
     }
 
     public Product saveOrUpdate(Product product) {
-        return repository.save(product);
+        return prefixProductPath(repository.save(product));
+    }
+
+    public Product prefixProductPath(Product product) {
+        String host = fileStorageService.getHost();
+        if (product.getImagePath().startsWith(host)) {
+            return product;
+        }
+        String fullPath = String.format("%s/%s", fileStorageService.getHost() ,product.getImagePath());
+        product.setImagePath(fullPath);
+        return product;
     }
 }
