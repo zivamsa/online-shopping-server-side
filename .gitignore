@@ -34,3 +34,4 @@ build/
 
 #
 src/main/uploaded-images/product/**
+!src/main/uploaded-images/product/placeholder.png

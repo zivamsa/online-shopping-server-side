@@ -16,7 +16,7 @@ import java.nio.file.*;
 public class FileStorageService {
 
     @Value("${upload.directory}")
-    private String uploadDirectory;
+    public String uploadDirectory;
 
     public String uploadProduct(MultipartFile image, Long productId) {
         if (!isImage(image)) {
@@ -42,6 +42,12 @@ public class FileStorageService {
         String host = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
         return String.format("%s/%s", host, parsedPath);
     }
+
+    public String productImagePath(String fileName) {
+        String host = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        return String.format("%s/%s/%s/%s", host, "image", "product", fileName);
+    }
+
 
     private String storeFile(MultipartFile file) {
         String filename = StringUtils.cleanPath(file.getOriginalFilename());

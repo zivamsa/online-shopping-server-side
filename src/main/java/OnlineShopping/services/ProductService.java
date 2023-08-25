@@ -38,6 +38,8 @@ public class ProductService {
         String imagePath = null;
         if (image != null) {
             imagePath = fileStorageService.uploadProduct(image, saved.getId());
+        } else {
+            imagePath = fileStorageService.productImagePath("placeholder.png");
         }
         product.setImagePath(imagePath);
 
