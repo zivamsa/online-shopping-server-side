@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -23,14 +24,29 @@ public class ProductService {
     @Autowired
     UserProductInteractionService productInteractionService;
 
+    @Autowired
+    AuthenticationService authenticationService;
+
+
 
     public Product getProductById(Long id) {
         return repository.findById(id).orElse(null);
     }
 
     public List<Product> getAllProducts(){
+        User user = authenticationService.getCurrentUser();
         List<Product> products = repository.findAll();
-        products.forEach(this::prefixProductPath);
+        products.forEach(product -> {
+            prefixProductPath(product);
+            // filter user interactions to only return those of the currently logged in user
+            if (user == null) {
+                product.setUserInteractions(new ArrayList<>());
+            } else {
+                product.setUserInteractions(
+                        product.getUserInteractions().stream().filter(interaction -> interaction.getUser().getId() == user.getId()).collect(Collectors.toList())
+                );
+            }
+        });
         return products;
     }
 
@@ -84,7 +100,8 @@ public class ProductService {
         return product;
     }
 
-    public boolean toggleWishlist(Long productId, User user) {
+    public boolean toggleWishlist(Long productId) {
+        User user = authenticationService.getCurrentUser();
         Product product = this.getProductById(productId);
         if (product == null) {
             throw new Error(String.format("Product id %d does not exist", productId));

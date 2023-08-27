@@ -153,7 +153,8 @@ public class AuthenticationService {
 
     public User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()) {
+        // check if a user is authenticated
+        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof User) ) {
             return null;
         }
         return (User)auth.getPrincipal();

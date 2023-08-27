@@ -19,9 +19,6 @@ public class ProductController {
     @Autowired
     ProductService productService;
 
-    @Autowired
-    AuthenticationService authenticationService;
-
     @GetMapping("/products")
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
@@ -52,9 +49,7 @@ public class ProductController {
     }
 
     @GetMapping("/wishlist/{id}")
-    public boolean wishlistProduct(@PathVariable("id") Long id,
-                                   HttpServletRequest request) {
-        User user = authenticationService.getUserByRequest(request);
-        return productService.toggleWishlist(id, user);
+    public boolean wishlistProduct(@PathVariable("id") Long id) {
+        return productService.toggleWishlist(id);
     }
 }
