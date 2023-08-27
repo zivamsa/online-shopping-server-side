@@ -14,6 +14,8 @@ import OnlineShopping.models.Token;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -149,9 +151,11 @@ public class AuthenticationService {
                 .build();
     }
 
-    public User getUserByRequest(HttpServletRequest request) {
-        final String token = extractHeaderAccessToken(request);
-        if (token == "") return null;
-        return getUserByToken(token);
+    public User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return null;
+        }
+        return (User)auth.getPrincipal();
     }
 }

@@ -28,8 +28,8 @@ public class DealController {
     }
 
     @GetMapping("/")
-    public List<Deal> deals(HttpServletRequest request) {
-        var user = authenticationService.getUserByRequest(request);
+    public List<Deal> deals() {
+        var user = authenticationService.getCurrentUser();
         if (user == null) return new ArrayList<Deal>();
         if (user.getRole() == Role.ADMIN) {
             return dealService.getAllDeals();
@@ -39,9 +39,8 @@ public class DealController {
     }
 
     @PostMapping("/")
-    public void createDeal(@Valid @RequestBody List<CheckoutRequest> purchases,
-                           HttpServletRequest request) {
-        var user = authenticationService.getUserByRequest(request);
+    public void createDeal(@Valid @RequestBody List<CheckoutRequest> purchases) {
+        var user = authenticationService.getCurrentUser();
         dealService.createDeal(purchases, user);
     }
 
