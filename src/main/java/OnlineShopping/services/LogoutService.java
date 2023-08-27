@@ -27,7 +27,7 @@ public class LogoutService implements LogoutHandler {
             HttpServletResponse response,
             Authentication authentication
     ) {
-        User user = authenticationService.getUserByRequest(request);
+        User user = authenticationService.getCurrentUser();
         if (user == null) return;
         Optional<Token> resToken = authenticationService.queryRefreshToken(user);
         if (resToken.isEmpty()) return;
