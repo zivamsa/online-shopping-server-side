@@ -61,10 +61,15 @@ public class ProductService {
     }
 
     public Product saveOrUpdate(Product product) {
-        return prefixProductPath(repository.save(product));
+        Product res = repository.save(product);
+        if (product.getImagePath() != null) {
+            res = prefixProductPath(res);
+        }
+        return res;
     }
 
     public Product prefixProductPath(Product product) {
+        if (product.getImagePath() == null) return product;
         String host = fileStorageService.getHost();
         if (product.getImagePath().startsWith(host)) {
             return product;
