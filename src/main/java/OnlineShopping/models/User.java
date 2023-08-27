@@ -50,6 +50,10 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Token> tokens;
 
+//    @OneToMany(mappedBy = "user")
+//    @JsonIgnore
+//    private List<UserProductInteraction> productInteractions;
+
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {

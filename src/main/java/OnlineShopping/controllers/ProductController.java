@@ -1,7 +1,10 @@
 package OnlineShopping.controllers;
 
 import OnlineShopping.models.Product;
+import OnlineShopping.models.User;
+import OnlineShopping.services.AuthenticationService;
 import OnlineShopping.services.ProductService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -15,6 +18,9 @@ import java.util.List;
 public class ProductController {
     @Autowired
     ProductService productService;
+
+    @Autowired
+    AuthenticationService authenticationService;
 
     @GetMapping("/products")
     public List<Product> getAllProducts() {
@@ -43,5 +49,12 @@ public class ProductController {
             @RequestPart(name = "image", required = false) MultipartFile image
     ) {
         return productService.updateProduct(product, image);
+    }
+
+    @GetMapping("/wishlist/{id}")
+    public boolean wishlistProduct(@PathVariable("id") Long id,
+                                   HttpServletRequest request) {
+        User user = authenticationService.getUserByRequest(request);
+        return productService.toggleWishlist(id, user);
     }
 }

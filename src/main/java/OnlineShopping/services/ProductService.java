@@ -1,6 +1,8 @@
 package OnlineShopping.services;
 
 import OnlineShopping.models.Product;
+import OnlineShopping.models.User;
+import OnlineShopping.models.UserProductInteraction;
 import OnlineShopping.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,9 +20,12 @@ public class ProductService {
     @Autowired
     FileStorageService fileStorageService;
 
+    @Autowired
+    UserProductInteractionService productInteractionService;
+
 
     public Product getProductById(Long id) {
-        return repository.findById(id).get();
+        return repository.findById(id).orElse(null);
     }
 
     public List<Product> getAllProducts(){
@@ -72,5 +77,17 @@ public class ProductService {
         String fullPath = String.format("%s/%s", fileStorageService.getHost() ,product.getImagePath());
         product.setImagePath(fullPath);
         return product;
+    }
+
+    public boolean toggleWishlist(Long productId, User user) {
+        Product product = this.getProductById(productId);
+        if (product == null) {
+            throw new Error(String.format("Product id %d does not exist", productId));
+        }
+        UserProductInteraction interaction = productInteractionService.findByUserProduct(user, product);
+        interaction.setWishlist(!interaction.isWishlist());
+
+        productInteractionService.saveOrUpdate(interaction);
+        return interaction.isWishlist();
     }
 }

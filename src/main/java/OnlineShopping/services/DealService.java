@@ -36,6 +36,9 @@ public class DealService {
     public void createDeal(List<CheckoutRequest> purchases, User user) {
         var mappedPurchases = purchases.stream().map(purchase -> {
             final Product product = productService.getProductById(purchase.getProductId());
+            if (product == null) {
+                throw new Error(String.format("Product id %d does not exist", purchase.getProductId()));
+            }
             return Purchase.builder()
                     .product(product)
                     .price(product.getPrice())
