@@ -43,7 +43,7 @@ public class ProductService {
         }
         product.setImagePath(imagePath);
 
-        return saveOrUpdate(product);
+        return saveOrUpdatePrefix(product);
     }
 
     public Product updateProduct(Product product, MultipartFile image) {
@@ -57,11 +57,15 @@ public class ProductService {
         }
 
         product.setImagePath(imagePath);
-        return saveOrUpdate(product);
+        return saveOrUpdatePrefix(product);
     }
 
     public Product saveOrUpdate(Product product) {
-        Product res = repository.save(product);
+        return repository.save(product);
+    }
+
+    public Product saveOrUpdatePrefix(Product product) {
+        Product res = this.saveOrUpdate(product);
         if (product.getImagePath() != null) {
             res = prefixProductPath(res);
         }
