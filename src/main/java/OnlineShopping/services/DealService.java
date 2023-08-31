@@ -36,6 +36,9 @@ public class DealService {
     public void createDeal(List<CheckoutRequest> purchases, User user) {
         var mappedPurchases = purchases.stream().map(purchase -> {
             final Product product = productService.getProductById(purchase.getProductId());
+            if (product.getStock() < purchase.getCount()) {
+                throw new Error(String.format("Not enough in stock for '%s'", product.getTitle()));
+            }
             return Purchase.builder()
                     .product(product)
                     .price(product.getPrice())
