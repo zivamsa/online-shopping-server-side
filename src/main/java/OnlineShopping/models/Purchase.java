@@ -28,5 +28,6 @@ public class Purchase {
 
     @Min(1)
     private int amount;
+    @Min(0)
     private double price;
 }
